@@ -1,0 +1,15 @@
+@EndUserText.label: 'SD for Travel Processor M 01'
+define service ZATS_RAMA_TRAVEL_PROCESSOR_SD {
+  expose ZATS_RAMA_C_TRAVEL_M_01      as Travel;
+  expose ZATS_RAMA_C_BOOKING_M_01     as Booking;
+  expose ZATS_RAMA_C_BOOKNGSUPPL_M_01 as BookingSuppliment;
+  expose /DMO/I_Agency                as Agency;
+  expose /DMO/I_Customer              as Customer;
+  expose I_Currency                   as Currency;
+  expose /DMO/I_Travel_Status_VH      as TravelStatus;
+  expose /DMO/I_Carrier               as Carrier;
+  expose /DMO/I_Connection            as Connection;
+  expose /DMO/I_Booking_Status_VH     as BookingStatus;
+  expose /DMO/I_Supplement            as Supplement;
+  expose /DMO/I_SupplementText        as SupplementText;
+}
