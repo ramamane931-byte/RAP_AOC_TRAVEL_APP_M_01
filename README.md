@@ -2,7 +2,8 @@
 RAP ABAP on Cloud Travel Application M 01
 
 Display dropdown for the field 'Overall Status':
-Resposible annotation: **@ObjectModel.resultSet.sizeCategory: #XS**
+
+Responsible annotation: **@ObjectModel.resultSet.sizeCategory: #XS**
 <img width="682" height="320" alt="image" src="https://github.com/user-attachments/assets/a78eeff1-9ac8-4fd4-980c-653460bdfad1" />
 
 **Result:**
