@@ -2,6 +2,7 @@
 @EndUserText.label: 'Supplement processor projection entity'
 @Metadata.ignorePropagatedAnnotations: false //// 'FALSE' All the annocations from child the child entity automatically fetch.
 @VDM.viewType: #CONSUMPTION
+@Metadata.allowExtensions: true
 define view entity ZATS_RAMA_C_BOOKNGSUPPL_M_01
   as projection on ZATS_RAMA_BOOKNGSUPPL_M_01
 {

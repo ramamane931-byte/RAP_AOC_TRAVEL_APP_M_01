@@ -11,27 +11,41 @@ define root view entity ZATS_RAMA_R_TRAVEL_01
   association of one to one /DMO/I_Overall_Status_VH as _OverallStatus on $projection.OverallStatus = _OverallStatus.OverallStatus
 {
 
-  key travel_id       as TravelId,
-      agency_id       as AgencyId,
-      customer_id     as CustomerId,
-      begin_date      as BeginDate,
-      end_date        as EndDate,
+      @ObjectModel.text.element: [ 'Description' ] //// DISPLAY VALUE 'TRAVEL ID TEXT' ALONG WITH 'TRAVEL ID'
+  key travel_id                                                        as TravelId,
+      @ObjectModel.text.element: [ 'AgencyName' ] //// DISPLAY VALUE 'AGENCY NAME' ALONG WITH 'AGENCY ID'
+      agency_id                                                        as AgencyId,
+      _Agency.Name                                                     as AgencyName,
+      @ObjectModel.text.element: [ 'CustomerName' ] //// DISPLAY VALUE 'CUSTOMER NAME' ALONG WITH 'CUSTOMER ID'
+      customer_id                                                      as CustomerId,
+      concat(concat( _Customer.FirstName, ' ' ), _Customer.LastName)   as CustomerName,
+      begin_date                                                       as BeginDate,
+      end_date                                                         as EndDate,
       @Semantics.amount.currencyCode: 'CurrencyCode'
-      booking_fee     as BookingFee,
+      booking_fee                                                      as BookingFee,
       @Semantics.amount.currencyCode: 'CurrencyCode'
-      total_price     as TotalPrice,
-      currency_code   as CurrencyCode,
-      description     as Description,
-      overall_status  as OverallStatus,
+      total_price                                                      as TotalPrice,
+      currency_code                                                    as CurrencyCode,
+      description                                                      as Description,
+      @ObjectModel.text.element: [ 'StatusText' ] //// DISPLAY VALUE 'STATUS TEXT' ALONG WITH 'STATUS ID'
+      @EndUserText.label: 'Spiderman'
+      overall_status                                                   as OverallStatus,
+      case overall_status
+          when 'O' then 2  -- 'open'       | 2: yellow colour
+          when 'A' then 3  -- 'accepted'   | 3: green colour
+          when 'X' then 1  -- 'rejected'   | 1: red colour
+          else 1           -- 'nothing'    | 0: unknown
+              end                                                      as Minion,
+      _OverallStatus._Text[ Language = $session.system_language ].Text as StatusText,
       @Semantics.user.createdBy: true
-      created_by      as CreatedBy,
+      created_by                                                       as CreatedBy,
       @Semantics.systemDateTime.createdAt: true
-      created_at      as CreatedAt,
+      created_at                                                       as CreatedAt,
       @Semantics.user.lastChangedBy: true
-      last_changed_by as LastChangedBy,
+      last_changed_by                                                  as LastChangedBy,
       @Semantics.systemDateTime.lastChangedAt: true
       //Will be treated as eTAG --TODO: Anubhav to explain later
-      last_changed_at as LastChangedAt,
+      last_changed_at                                                  as LastChangedAt,
 
       --expose the composition
       _Booking,
