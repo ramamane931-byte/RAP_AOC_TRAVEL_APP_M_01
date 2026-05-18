@@ -1,0 +1,29 @@
+projection;
+strict ( 2 );
+
+define behavior for ZATS_RAMA_C_TRAVEL_M_01 alias Travel
+{
+  use create;
+  use update;
+  use delete;
+
+  use association _Booking { create; }
+}
+
+define behavior for ZATS_RAMA_C_BOOKING_M_01 alias Booking
+{
+  use update;
+  use delete;
+
+  use association _Travel;
+  use association _BookingSuppl { create; }
+}
+
+define behavior for ZATS_RAMA_C_BOOKNGSUPPL_M_01 alias BookSuppl
+{
+  use update;
+  use delete;
+
+  use association _Travel;
+  use association _Booking;
+}

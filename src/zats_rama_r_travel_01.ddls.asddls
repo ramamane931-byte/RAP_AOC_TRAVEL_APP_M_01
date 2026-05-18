@@ -10,13 +10,24 @@ define root view entity ZATS_RAMA_R_TRAVEL_01
   association of one to one I_Currency               as _Currency      on $projection.CurrencyCode = _Currency.Currency
   association of one to one /DMO/I_Overall_Status_VH as _OverallStatus on $projection.OverallStatus = _OverallStatus.OverallStatus
 {
-
       @ObjectModel.text.element: [ 'Description' ] //// DISPLAY VALUE 'TRAVEL ID TEXT' ALONG WITH 'TRAVEL ID'
   key travel_id                                                        as TravelId,
       @ObjectModel.text.element: [ 'AgencyName' ] //// DISPLAY VALUE 'AGENCY NAME' ALONG WITH 'AGENCY ID'
+      @Consumption.valueHelpDefinition: [{
+          entity: {
+              name: '/DMO/I_Agency',
+              element: 'AgencyID'
+          }
+      }]
       agency_id                                                        as AgencyId,
       _Agency.Name                                                     as AgencyName,
       @ObjectModel.text.element: [ 'CustomerName' ] //// DISPLAY VALUE 'CUSTOMER NAME' ALONG WITH 'CUSTOMER ID'
+      @Consumption.valueHelpDefinition: [{
+          entity: {
+              name: '/DMO/I_Customer',
+              element: 'CustomerID'
+          }
+      }]
       customer_id                                                      as CustomerId,
       concat(concat( _Customer.FirstName, ' ' ), _Customer.LastName)   as CustomerName,
       begin_date                                                       as BeginDate,
@@ -25,17 +36,31 @@ define root view entity ZATS_RAMA_R_TRAVEL_01
       booking_fee                                                      as BookingFee,
       @Semantics.amount.currencyCode: 'CurrencyCode'
       total_price                                                      as TotalPrice,
+      @Consumption.valueHelpDefinition: [{
+          entity: {
+              name: 'I_Currency',
+              element: 'Currency'
+          }
+      }]
       currency_code                                                    as CurrencyCode,
       description                                                      as Description,
-      @ObjectModel.text.element: [ 'StatusText' ] //// DISPLAY VALUE 'STATUS TEXT' ALONG WITH 'STATUS ID'
+      @ObjectModel.text.element: [ 'StatusText' ]  //// DISPLAY VALUE 'STATUS TEXT' ALONG WITH 'STATUS ID'
       @EndUserText.label: 'Spiderman'
+      @Consumption.valueHelpDefinition: [{
+          entity: {
+              name: '/DMO/I_Overall_Status_VH',
+              element: 'OverallStatus'
+          }
+      }]
       overall_status                                                   as OverallStatus,
+
       case overall_status
           when 'O' then 2  -- 'open'       | 2: yellow colour
           when 'A' then 3  -- 'accepted'   | 3: green colour
           when 'X' then 1  -- 'rejected'   | 1: red colour
           else 1           -- 'nothing'    | 0: unknown
               end                                                      as Minion,
+              
       _OverallStatus._Text[ Language = $session.system_language ].Text as StatusText,
       @Semantics.user.createdBy: true
       created_by                                                       as CreatedBy,
@@ -55,4 +80,5 @@ define root view entity ZATS_RAMA_R_TRAVEL_01
       _Customer,
       _Currency,
       _OverallStatus
+
 }
