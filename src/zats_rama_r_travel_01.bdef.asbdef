@@ -1,12 +1,13 @@
 //managed will tell RAP that developer want RAP to create most of code automatically
-managed
+managed;
 //In case developer want to plug extra coding, this is the class where we can do it
-implementation in class ZBP_ATS_RAMA_R_TRAVEL_01 unique;
+
 //Tell the RAP engine to syntax check our code strictly
 strict ( 2 );
 
 //Root Entity behavior
 define behavior for ZATS_RAMA_R_TRAVEL_01 alias Travel
+implementation in class ZBP_ATS_RAMA_R_TRAVEL_01 unique
 //Tell the RAP that it should WRITE, UPDATE, MODIFY, DELETE data from which table
 persistent table /dmo/travel_m
 //How the data will be locked ENQUEUE, DEQUEUE - if the travel data is locked by used, other
@@ -17,16 +18,22 @@ lock master
 authorization master ( instance, global )
 //it is a field which is used by framework to evaluate whether data was changed in meanwhile OR not
 etag master LastChangedAt
+//We want as a developer to take control of creating Travel ID
+early numbering
 {
   //Behavior what we want RAP to generate for us
   create;
   update;
   delete;
-//  field ( readonly ) TravelId;
   //static feature control which says that a user cannot change primary key in update mode
-  //field ( readonly ) TravelId;
+  field ( readonly ) TravelId;
+  field ( mandatory ) begindate, enddate, agencyid, customerid;
+
+  //Since we want to create new BO instance (Factory), Our reference is mohan's (instance)
+  factory action copyTravel [1];
   //That create of booking depends on travel, like you cannot create a so line item w/o creating header
-  association _Booking { create; }
+  // Dynamic feature control - features:instance
+  association _Booking { create ( features : instance ); }
 
   mapping for /dmo/travel_m
     {
@@ -49,18 +56,22 @@ etag master LastChangedAt
 
 //Behavior for Booking entity
 define behavior for ZATS_RAMA_BOOKING_M_01 alias Booking
+implementation in class ZBP_ATS_RAMA_R_BOOKING_01 unique
 persistent table /dmo/booking_m
 //if parent data is locked child is also locked automatically
 lock dependent by _Travel
 //lets check the authorization and role @ parent if that pass, we allow booking also to be updated
 authorization dependent by _Travel
 etag master LastChangedAt
+//support for automatic creation of early numbering for Bookings
+early numbering
 {
   //user is allowed to only change and delete booking independently
   update;
   delete;
   //While user is editing the booking data, they cannot change the travel header data
-  field ( readonly ) TravelId;
+  field ( readonly ) TravelId, BookingId;
+  field ( mandatory ) CarrierId, ConnectionId, BookingDate, customerid;
   association _Travel;
   //Supplement creation is possible with booking
   association _BookingSuppl { create; }
@@ -86,10 +97,12 @@ persistent table /dmo/booksuppl_m
 lock dependent by _Travel
 authorization dependent by _Travel
 etag master LastChangedAt
+early numbering
 {
   update;
   delete;
-  field ( readonly ) TravelId, BookingId;
+  field ( readonly ) TravelId, BookingId, BookingSupplementId;
+  field ( mandatory ) SupplementId, CurrencyCode, price;
   association _Travel;
   association _Booking;
 
