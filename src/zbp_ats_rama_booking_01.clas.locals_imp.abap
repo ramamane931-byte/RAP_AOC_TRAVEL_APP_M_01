@@ -4,6 +4,9 @@ CLASS lhc_Booking DEFINITION INHERITING FROM cl_abap_behavior_handler.
     METHODS earlynumbering_cba_Bookingsupp FOR NUMBERING
       IMPORTING entities FOR CREATE Booking\_Bookingsuppl.
 
+    METHODS calcTotalPriceBook FOR DETERMINE ON MODIFY
+      IMPORTING keys FOR Booking~calcTotalPriceBook.
+
 ENDCLASS.
 
 CLASS lhc_Booking IMPLEMENTATION.
@@ -68,6 +71,17 @@ CLASS lhc_Booking IMPLEMENTATION.
 
     ""Step 4: Loop over all the entities of travel with same travel id and increment the max booking id
 
+
+
+  ENDMETHOD.
+
+  METHOD calcTotalPriceBook.
+
+    ""How to call an action using the EML
+    MODIFY ENTITIES OF zats_rama_r_travel_01 IN LOCAL MODE
+        ENTITY travel
+            EXECUTE reCalcTotalPrice
+            FROM CORRESPONDING #( keys ).
 
   ENDMETHOD.
 

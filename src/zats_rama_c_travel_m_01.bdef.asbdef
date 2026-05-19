@@ -1,5 +1,7 @@
 projection;
 strict ( 2 );
+use side effects;
+use draft;
 
 define behavior for ZATS_RAMA_C_TRAVEL_M_01 alias Travel
 {
@@ -7,7 +9,14 @@ define behavior for ZATS_RAMA_C_TRAVEL_M_01 alias Travel
   use update;
   use delete;
 
-  use association _Booking { create; }
+  use action Activate;
+  use action Edit;
+  use action Resume;
+  use action Prepare;
+  use action Discard;
+
+  use action copyTravel;
+  use association _Booking { create; with draft; }
 }
 
 define behavior for ZATS_RAMA_C_BOOKING_M_01 alias Booking
@@ -15,8 +24,8 @@ define behavior for ZATS_RAMA_C_BOOKING_M_01 alias Booking
   use update;
   use delete;
 
-  use association _Travel;
-  use association _BookingSuppl { create; }
+  use association _Travel { with draft; }
+  use association _BookingSuppl { create; with draft; }
 }
 
 define behavior for ZATS_RAMA_C_BOOKNGSUPPL_M_01 alias BookSuppl
@@ -24,6 +33,6 @@ define behavior for ZATS_RAMA_C_BOOKNGSUPPL_M_01 alias BookSuppl
   use update;
   use delete;
 
-  use association _Travel;
-  use association _Booking;
+  use association _Travel { with draft; }
+  use association _Booking { with draft; }
 }
