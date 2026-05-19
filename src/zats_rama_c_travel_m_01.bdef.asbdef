@@ -1,7 +1,7 @@
 projection;
 strict ( 2 );
 use side effects;
-use draft;
+use collaborative draft;
 
 define behavior for ZATS_RAMA_C_TRAVEL_M_01 alias Travel
 {
@@ -14,6 +14,8 @@ define behavior for ZATS_RAMA_C_TRAVEL_M_01 alias Travel
   use action Resume;
   use action Prepare;
   use action Discard;
+  use action Share;
+  use action validateCustomer;
 
   use action copyTravel;
   use association _Booking { create; with draft; }

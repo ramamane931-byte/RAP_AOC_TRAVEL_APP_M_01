@@ -1,3 +1,63 @@
+CLASS lsc_zats_rama_r_travel_01 DEFINITION INHERITING FROM cl_abap_behavior_saver.
+
+  PROTECTED SECTION.
+
+    METHODS save_modified REDEFINITION.
+
+ENDCLASS.
+
+CLASS lsc_zats_rama_r_travel_01 IMPLEMENTATION.
+
+  METHOD save_modified.
+
+    ""call function 'SWDD_WORKFLOW_START'
+    DATA: lt_log_data   TYPE STANDARD TABLE OF /dmo/log_travel,
+          lt_final_data TYPE STANDARD TABLE OF /dmo/log_travel.
+
+    IF update-travel IS NOT INITIAL.
+
+      "get all changes in our local table done by user
+      lt_log_data = CORRESPONDING #( update-travel MAPPING travel_id = TravelId ).
+
+      LOOP AT update-travel ASSIGNING FIELD-SYMBOL(<fs_changes>).
+
+        ASSIGN lt_log_data[ travel_id = <fs_changes>-TravelId ]
+            TO FIELD-SYMBOL(<travel_log_db>).
+
+        GET TIME STAMP FIELD <travel_log_db>-created_at.
+
+        IF <fs_changes>-%control-CustomerId = if_abap_behv=>mk-on.
+
+          <travel_log_db>-change_id = cl_system_uuid=>create_uuid_x16_static( ).
+          <travel_log_db>-changed_field_name = 'ramdas_customer'.
+          <travel_log_db>-changed_value = <fs_changes>-CustomerId.
+          <travel_log_db>-changing_operation = 'update'.
+
+          APPEND <travel_log_db> TO lt_final_data.
+
+        ENDIF.
+
+        IF <fs_changes>-%control-AgencyId = if_abap_behv=>mk-on.
+
+          <travel_log_db>-change_id = cl_system_uuid=>create_uuid_x16_static( ).
+          <travel_log_db>-changed_field_name = 'ramdas_agency'.
+          <travel_log_db>-changed_value = <fs_changes>-AgencyId.
+          <travel_log_db>-changing_operation = 'update'.
+
+          APPEND <travel_log_db> TO lt_final_data.
+
+        ENDIF.
+
+
+      ENDLOOP.
+
+      INSERT /dmo/log_travel FROM TABLE @lt_final_data.
+    ENDIF.
+
+  ENDMETHOD.
+
+ENDCLASS.
+
 CLASS lhc_Travel DEFINITION INHERITING FROM cl_abap_behavior_handler.
   PRIVATE SECTION.
 
@@ -32,14 +92,68 @@ ENDCLASS.
 
 CLASS lhc_Travel IMPLEMENTATION.
 
-  METHOD get_instance_authorizations.
-*    data: lt_failed type response for failed early ZATS_RAMA_R_TRAVEL_01.
-*    data: lt_reported type response for REPORTED early ZATS_RAMA_R_TRAVEL_01.
-*    data : lt_test type response for MAPPED ZATS_RAMA_R_TRAVEL_01//travel.
-    "AUTHORITY-CHECK
+  METHOD get_global_authorizations.
+
+    AUTHORITY-CHECK OBJECT 'ZATS_RAMA'
+               ID 'ACTVT' FIELD '02'.
+
   ENDMETHOD.
 
-  METHOD get_global_authorizations.
+  METHOD get_instance_authorizations.
+
+*    When a user tries to edit a travel request,
+*    if the travel request status is CANCELLED,
+*    then we need to check if the given user is a MANAGER.
+*    If yes, they can edit the cancelled request also.
+*    However else, the user is not allowed to edit cancelled request.
+
+
+    "Step 1: Define a return data structure of return table
+    DATA ls_return LIKE LINE OF result.
+
+    "Step 2: Read the instance of the BO, read overallstatus
+    READ ENTITIES OF zats_rama_r_travel_01 IN LOCAL MODE
+        ENTITY travel
+        FIELDS ( travelid overallstatus )
+        WITH CORRESPONDING #( keys )
+        RESULT DATA(lt_travel)
+        FAILED DATA(lt_failed).
+
+    "Step 3: Check if the status is CANCELLED
+    LOOP AT lt_travel INTO DATA(ls_travel).
+
+      DATA(lv_auth) = abap_false.
+
+      IF ( ls_travel-OverallStatus = 'X' ).
+
+        AUTHORITY-CHECK OBJECT 'ZATS_RAMA'
+           ID 'ACTVT' FIELD '02'.
+
+        IF sy-subrc = 0. "PASS user is manager
+          lv_auth = abap_true.
+        ENDIF.
+
+      ELSE.
+        lv_auth = abap_true.
+      ENDIF.
+
+      ls_return = VALUE #(  travelid =  ls_travel-TravelId
+                            %action-Edit = COND #(
+                                                  WHEN lv_auth EQ abap_false
+                                                      THEN if_abap_behv=>auth-unauthorized
+                                                      ELSE if_abap_behv=>auth-allowed
+                            )
+                            %update = COND #(
+                                                  WHEN lv_auth EQ abap_false
+                                                      THEN if_abap_behv=>auth-unauthorized
+                                                      ELSE if_abap_behv=>auth-allowed
+                            )
+       ).
+
+      APPEND ls_return TO result.
+
+    ENDLOOP.
+
   ENDMETHOD.
 
   METHOD earlynumbering_create.
@@ -171,6 +285,7 @@ CLASS lhc_Travel IMPLEMENTATION.
         ENDIF.
       ENDLOOP.
     ENDLOOP.
+
 
   ENDMETHOD.
 
@@ -367,7 +482,6 @@ CLASS lhc_Travel IMPLEMENTATION.
     ENDLOOP.
 
 
-
 *    Compare the currency of Booking and Supplement with header currency
     LOOP AT amounts_per_currencycode INTO DATA(ls_amount_per_currency).
 *           If it does not match, perform currency conversion
@@ -396,8 +510,6 @@ CLASS lhc_Travel IMPLEMENTATION.
     WITH CORRESPONDING #( travel ).
 *    Return the mapped data as a result of internal action
 
-
-
   ENDMETHOD.
 
   METHOD calcTotalPrice.
@@ -413,7 +525,7 @@ CLASS lhc_Travel IMPLEMENTATION.
   METHOD validateHeaderData.
 
     ""Step 1: Read the data of incoming request from EML
-    READ ENTITIES OF zats_rama_r_travel_01 in LOCAL MODE
+    READ ENTITIES OF zats_rama_r_travel_01 IN LOCAL MODE
         ENTITY travel
             FIELDS ( agencyid customerid begindate enddate )
             WITH CORRESPONDING #( keys )
@@ -472,8 +584,8 @@ CLASS lhc_Travel IMPLEMENTATION.
       ""If in the DB customer does not exist
       IF ( ls_travel-agencyid IS INITIAL OR NOT line_exists( lt_agency_db[ agency_id = ls_travel-agencyid ] ) ).
 
-        APPEND VALUE #( %tky = ls_travel-%tky ) TO failed-travel.
-        APPEND VALUE #( %tky = ls_travel-%tky
+        APPEND VALUE #( %tky = ls_travel-%tky %is_draft = ls_travel-%is_draft ) TO failed-travel.
+        APPEND VALUE #( %tky = ls_travel-%tky %is_draft = ls_travel-%is_draft
                         %element-agencyid = if_abap_behv=>mk-on
                         %msg = NEW /dmo/cm_flight_messages(
                                                             textid = /dmo/cm_flight_messages=>agency_unkown
@@ -491,8 +603,6 @@ CLASS lhc_Travel IMPLEMENTATION.
 
     ENDLOOP.
 
-
   ENDMETHOD.
-
 
 ENDCLASS.
