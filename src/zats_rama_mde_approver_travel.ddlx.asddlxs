@@ -5,7 +5,7 @@
     title : { value: 'TravelId' },
     description : { value : 'Description' }
 }
-annotate entity ZATS_RAMA_C_TRAVEL_M_01 with
+annotate entity ZATS_RAMA_TRAVEL_APPROVER with
 {
   @UI.facet: [
       {
@@ -62,22 +62,16 @@ annotate entity ZATS_RAMA_C_TRAVEL_M_01 with
           position: 20,
           label: 'Bookings',
           targetElement: '_Booking'
-      },
-      {
-          purpose: #STANDARD,
-          type: #LINEITEM_REFERENCE,
-          id: 'idAttach',
-          position: 30,
-          label: 'Attachments',
-          targetElement: '_Attachments'
-      }      
+      }
 
   ]
-  @UI.selectionField: [{ position: 10 }] //// ADD AS FILTER PARAMETER.
-  @UI.lineItem: [{ position: 10 },       //// ADD AS DEFAULT FIELD SELECTION WHEN CLICK ON THE BUTTON 'GO'.
-                 { type: #FOR_ACTION, dataAction: 'copyTravel', label: 'Copy Request' }]
+  @UI.selectionField: [{ position: 10 }]
+  @UI.lineItem: [{ position: 10 },
+                 { type: #FOR_ACTION, dataAction: 'acceptTravel', label: 'Approve' },
+                 { type: #FOR_ACTION, dataAction: 'rejectTravel', label: 'Reject' }]
   @UI.identification: [{ position: 10 },
-                 { type: #FOR_ACTION, dataAction: 'copyTravel', label: 'Copy Chaste' }]
+                 { type: #FOR_ACTION, dataAction: 'acceptTravel', label: 'Approve' },
+                 { type: #FOR_ACTION, dataAction: 'rejectTravel', label: 'Reject' }]
   TravelId;
 
   @UI.selectionField: [{ position: 20 }]
@@ -117,19 +111,6 @@ annotate entity ZATS_RAMA_C_TRAVEL_M_01 with
   @UI.dataPoint: { qualifier: 'bumbblebee', title: 'Travel Status', criticality: 'Minion' }
   @UI.fieldGroup: [{ position: 30, qualifier: 'spiderman' }]
   OverallStatus;
-
-  @UI.lineItem: [{ position: 70, importance: #HIGH }]
-  @UI.fieldGroup: [{ position: 60, qualifier: 'spiderman' }]
-  dayofflight;
-  
-  @UI.lineItem: [{ position: 80, importance: #HIGH }]
-  @UI.fieldGroup: [{ position: 70, qualifier: 'spiderman' }]
-  co2tax;
-
-  //    CreatedBy;
-  //    CreatedAt;
-  //    LastChangedBy;
-  //    LastChangedAt;
 
 
 }

@@ -5,6 +5,7 @@
 define root view entity ZATS_RAMA_R_TRAVEL_01
   as select from /dmo/travel_m
   composition [0..*] of ZATS_RAMA_BOOKING_M_01       as _Booking
+  composition [0..*] of ZATS_RAMA_ATTACH_M_01        as _Attachments
   association of one to one /DMO/I_Agency            as _Agency        on $projection.AgencyId = _Agency.AgencyID
   association of one to one /DMO/I_Customer          as _Customer      on $projection.CustomerId = _Customer.CustomerID
   association of one to one I_Currency               as _Currency      on $projection.CurrencyCode = _Currency.Currency
@@ -60,7 +61,7 @@ define root view entity ZATS_RAMA_R_TRAVEL_01
           when 'X' then 1  -- 'rejected'   | 1: red colour
           else 1           -- 'nothing'    | 0: unknown
               end                                                      as Minion,
-              
+
       _OverallStatus._Text[ Language = $session.system_language ].Text as StatusText,
       @Semantics.user.createdBy: true
       created_by                                                       as CreatedBy,
@@ -74,6 +75,7 @@ define root view entity ZATS_RAMA_R_TRAVEL_01
 
       --expose the composition
       _Booking,
+      _Attachments,
 
       --Public Association
       _Agency,

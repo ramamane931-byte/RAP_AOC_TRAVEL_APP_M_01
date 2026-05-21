@@ -1,0 +1,29 @@
+projection;
+strict ( 2 );
+use collaborative draft;
+
+define behavior for ZATS_RAMA_TRAVEL_APPROVER alias Travel
+{
+
+  use update;
+
+  field ( readonly ) agencyid, customerid, begindate, enddate, totalprice;
+
+  use action acceptTravel;
+  use action rejectTravel;
+
+  use action Prepare;
+  use action Edit;
+  use action Resume;
+  use action Activate;
+  use action Discard;
+  use action Share;
+
+  use association _Booking { with draft; }
+}
+
+define behavior for ZATS_RAMA_BOOKING_APPROVER alias Booking
+{
+
+  use association _Travel { with draft; }
+}

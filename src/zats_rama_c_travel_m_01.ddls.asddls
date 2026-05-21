@@ -7,29 +7,38 @@ define root view entity ZATS_RAMA_C_TRAVEL_M_01
   provider contract transactional_query
   as projection on ZATS_RAMA_R_TRAVEL_01
 {
-  key TravelId,
-      AgencyId,
-      CustomerId,
-      BeginDate,
-      EndDate,
-      BookingFee,
-      TotalPrice,
-      CurrencyCode,
-      Description,
-      OverallStatus,
-      CreatedBy,
-      CreatedAt,
-      LastChangedBy,
-      LastChangedAt,
-      AgencyName,
-      CustomerName,
-      StatusText,
-      Minion,
-      
-      /* Associations */
-      _Agency,
-      _Booking : redirected to composition child ZATS_RAMA_C_BOOKING_M_01,
-      _Currency,
-      _Customer,
-      _OverallStatus
+  key     TravelId,
+          AgencyId,
+          CustomerId,
+          BeginDate,
+          EndDate,
+          BookingFee,
+          TotalPrice,
+          CurrencyCode,
+          Description,
+          OverallStatus,
+          CreatedBy,
+          CreatedAt,
+          LastChangedBy,
+          LastChangedAt,
+          AgencyName,
+          CustomerName,
+          StatusText,
+          Minion,
+
+          @ObjectModel.virtualElementCalculatedBy: 'ABAP:ZCL_ATS_RAMA_VE'
+          @EndUserText.label: 'CO2 Tax'
+  virtual CO2Tax      : abap.int4,
+
+          @ObjectModel.virtualElementCalculatedBy: 'ABAP:ZCL_ATS_RAMA_VE'
+          @EndUserText.label: 'Day Of Travel'
+  virtual dayOfFlight : abap.char(10),
+
+          /* Associations */
+          _Agency,
+          _Booking     : redirected to composition child ZATS_RAMA_C_BOOKING_M_01,
+          _Attachments : redirected to composition child ZATS_RAMA_C_ATTACH_M_01,
+          _Currency,
+          _Customer,
+          _OverallStatus
 }

@@ -1,0 +1,9 @@
+@EndUserText.label: 'Service Defination for Travel Approver'
+define service ZATS_RAMA_TRAVEL_APPROVER_SD {
+  expose ZATS_RAMA_TRAVEL_APPROVER  as Travel;
+  expose ZATS_RAMA_BOOKING_APPROVER as Booking;
+  expose /DMO/I_Agency              as Agency;
+  expose /DMO/I_Customer            as Customer;
+  expose I_Currency                 as Currency;
+  expose /DMO/I_Travel_Status_VH    as TravelStatus;
+}
