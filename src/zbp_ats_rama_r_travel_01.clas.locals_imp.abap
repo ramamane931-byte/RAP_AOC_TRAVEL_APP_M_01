@@ -9,6 +9,8 @@ ENDCLASS.
 CLASS lsc_ZATS_RAMA_R_TRAVEL_01 IMPLEMENTATION.
 
   METHOD save_modified.
+  """ This method defined from -  Added in the Behaviour Defination: 'with additional save'
+
     ""call function 'SWDD_WORKFLOW_START'
     DATA: lt_log_data   TYPE STANDARD TABLE OF /dmo/log_travel,
           lt_final_data TYPE STANDARD TABLE OF /dmo/log_travel.
@@ -162,11 +164,13 @@ CLASS lhc_Travel IMPLEMENTATION.
       ENDIF.
 
       ls_return = VALUE #(  travelid =  ls_travel-TravelId
+                         "" ' %action-Edit' work for ODATA V4
                             %action-Edit = COND #(
                                                   WHEN lv_auth EQ abap_false
                                                       THEN if_abap_behv=>auth-unauthorized
                                                       ELSE if_abap_behv=>auth-allowed
                             )
+                         "" ' %update' work for ODATA V2
                             %update = COND #(
                                                   WHEN lv_auth EQ abap_false
                                                       THEN if_abap_behv=>auth-unauthorized

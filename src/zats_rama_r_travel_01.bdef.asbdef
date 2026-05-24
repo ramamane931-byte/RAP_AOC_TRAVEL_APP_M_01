@@ -6,7 +6,7 @@ managed implementation in class ZBP_ATS_RAMA_R_TRAVEL_01 unique;
 strict ( 2 );
 
 //s1: add the draft feature at BO level zkas
-with collaborative draft;
+with collaborative draft; //Allow user to do make same changes in the instance and reflact live changes parallely.
 
 //Root Entity behavior
 define behavior for ZATS_RAMA_R_TRAVEL_01 alias Travel
@@ -19,7 +19,7 @@ lock master
 //s3: Add the total etag field
 total etag LastChangedAt
 //s4: define a draft table, use quick fix to create it
-draft table zats_rama_dtrav query zats_rama_travq
+draft table zats_rama_dtrav query zats_rama_travq  // 'zats_rama_travq' root view part of a 'collaborative draft'.
 //To Control data security - permission - authorization of who can create, edit, delete data
 //TODO: Developer must implement coding for this line in class - I AM SKIPPING IT TO SHOW YOU WAT HAPPENS ;)
 authorization master ( instance, global )
@@ -54,9 +54,10 @@ with additional save
   validation validateHeaderData on save { create; field CustomerId, BeginDate, EndDate, AgencyId; }
 
   //you can invoke it by a button click or using side effect (on fly while draft)
+  // Cannot implement 'validateCustomer'. It's just an anchor point to invoke other validation things.
   determine action validateCustomer
   {
-    validation validateHeaderData;
+    validation validateHeaderData; //// Validating 'Agency ID' and 'Customer ID'. If it's unknown then throw err.
   }
 
   //s2: satisfy Ego of RAP framework; to put the draft actions

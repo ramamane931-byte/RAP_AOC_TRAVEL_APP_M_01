@@ -16,7 +16,7 @@ implementation in class ZCL_ATS_RAMA_AUGMNT_TRAV unique  //// Class for 'AUGUMEN
   use action Resume;
   use action Prepare;
   use action Discard;
-  use action Share;
+  use action Share;  ///Part of collaborative draft // Display a 'SHARE' button when a draft mode on.
   use action validateCustomer;
 
   use action copyTravel;

@@ -3,7 +3,7 @@
 @EndUserText.label: 'Draft query view for ZATS_RAMA_DTRAV'
 @Metadata.ignorePropagatedAnnotations: false
 @Metadata.allowExtensions: true
-define view entity ZATS_RAMA_TRAVQ
+define root view entity ZATS_RAMA_TRAVQ
   as select from zats_rama_dtrav
 {
   key travelid                      as Travelid,
