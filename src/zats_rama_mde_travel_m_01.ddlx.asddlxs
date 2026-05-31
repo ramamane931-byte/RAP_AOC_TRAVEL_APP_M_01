@@ -120,11 +120,11 @@ annotate entity ZATS_RAMA_C_TRAVEL_M_01 with
 
   @UI.lineItem: [{ position: 70, importance: #HIGH }]
   @UI.fieldGroup: [{ position: 60, qualifier: 'spiderman' }]
-  dayofflight;
+  dayOfFlight;
   
   @UI.lineItem: [{ position: 80, importance: #HIGH }]
   @UI.fieldGroup: [{ position: 70, qualifier: 'spiderman' }]
-  co2tax;
+  CO2Tax;
 
   //    CreatedBy;
   //    CreatedAt;

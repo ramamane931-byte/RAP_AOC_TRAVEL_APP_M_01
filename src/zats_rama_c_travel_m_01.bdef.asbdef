@@ -17,7 +17,7 @@ implementation in class ZCL_ATS_RAMA_AUGMNT_TRAV unique  //// Class for 'AUGUMEN
   use action Prepare;
   use action Discard;
   use action Share;  ///Part of collaborative draft // Display a 'SHARE' button when a draft mode on.
-  use action validateCustomer;
+  use action validateCustomer; ///Display Fields errors base on TAB or on fly.
 
   use action copyTravel;
   use association _Booking { create; with draft; }

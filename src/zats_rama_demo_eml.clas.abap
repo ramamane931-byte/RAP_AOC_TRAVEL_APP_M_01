@@ -37,11 +37,10 @@ CLASS zats_rama_demo_eml IMPLEMENTATION.
             REPORTED DATA(lt_reported)
             .
 
-        ""read dependent booking data fro travel
+        ""read dependent booking data for travel
         READ ENTITIES OF zats_rama_r_travel_01
             ENTITY Travel
-            BY \_Booking ALL FIELDS WITH
-            CORRESPONDING #( lt_result )
+            BY \_Booking ALL FIELDS WITH CORRESPONDING #( lt_result )
             RESULT DATA(lt_result_book)
             FAILED lt_failed
             REPORTED lt_reported

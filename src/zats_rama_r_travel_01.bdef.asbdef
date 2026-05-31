@@ -32,6 +32,8 @@ early numbering
 with additional save
 {
   //Behavior what we want RAP to generate for us
+/// 'PRECHECK' To verify the country of origin of customer and agency are same or not,
+///  Before click on Save button on fly it will verify the data and show errors accordigly if not satisfied.
   create ( authorization : global, precheck );
   update ( precheck );
   delete;
@@ -40,9 +42,10 @@ with additional save
   field ( mandatory ) begindate, enddate, agencyid, customerid;
 
   //Since we want to create new BO instance (Factory), Our reference is mohan's (instance)
-  factory action copyTravel [1];
+  factory action copyTravel [1];  ////INSTANCE BASE FACTORY DATA ACTION
 
   //non factory data action - change the state of the instance of a BO
+  // Dynamic feature control - 'features:instance'
   action ( features : instance ) acceptTravel result [1] $self;
   action ( features : instance ) rejectTravel result [1] $self;
 
@@ -55,7 +58,7 @@ with additional save
 
   //you can invoke it by a button click or using side effect (on fly while draft)
   // Cannot implement 'validateCustomer'. It's just an anchor point to invoke other validation things.
-  determine action validateCustomer
+  determine action validateCustomer ///'validateCustomer' if we nee
   {
     validation validateHeaderData; //// Validating 'Agency ID' and 'Customer ID'. If it's unknown then throw err.
   }
@@ -72,17 +75,17 @@ with additional save
   determination calcTotalPrice on modify { field BookingFee, CurrencyCode; create; }
 
   //Sideeffect to make fiori do a GET call to load updated data
-  side effects
+  side effects  ///TO MAKE 'TOTAL PRICE' FIELD VALUE AUTO REFRESH TO UPDATE THE VALUE
   {
     field BookingFee affects field TotalPrice;
     entity _Booking affects field TotalPrice;
     //side effect which trigger the validation on fly
-    determine action validateCustomer executed on field CustomerId
+    determine action validateCustomer executed on field CustomerId ///Display Fields errors base on TAB or on fly.
     affects messages;
   }
 
   //That create of booking depends on travel, like you cannot create a so line item w/o creating header
-  // Dynamic feature control - features:instance
+  // Dynamic feature control - 'features:instance'
   //s5: add with draft for child entity
   association _Booking { create ( features : instance ); with draft; }
 
@@ -173,7 +176,7 @@ early numbering
 {
   update;
   delete;
-  field ( readonly ) TravelId, BookingId, BookingSupplementId;
+  field ( readonly ) TravelId, BookingId, BookingSupplementId, LastChangedAt;
   field ( mandatory ) SupplementId, CurrencyCode, price;
   association _Travel { with draft; }
   association _Booking { with draft; }
@@ -217,7 +220,7 @@ etag master LastChangedAt
   delete;
   //While user is editing the booking data, they cannot change the travel header data
   field ( numbering : managed ) id;
-  field ( readonly ) TravelId;
+  field ( readonly ) TravelId, id;
 
   association _Travel { with draft; }
 

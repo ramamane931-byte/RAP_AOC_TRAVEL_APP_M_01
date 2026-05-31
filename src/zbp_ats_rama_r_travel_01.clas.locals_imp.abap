@@ -9,7 +9,7 @@ ENDCLASS.
 CLASS lsc_ZATS_RAMA_R_TRAVEL_01 IMPLEMENTATION.
 
   METHOD save_modified.
-  """ This method defined from -  Added in the Behaviour Defination: 'with additional save'
+    """ This method defined from -  Added in the Behaviour Defination: 'with additional save'
 
     ""call function 'SWDD_WORKFLOW_START'
     DATA: lt_log_data   TYPE STANDARD TABLE OF /dmo/log_travel,
@@ -338,10 +338,8 @@ CLASS lhc_Travel IMPLEMENTATION.
       lv_allow = if_abap_behv=>fc-o-enabled.
     ENDIF.
 
-
-
     result = VALUE #(  FOR travel IN lt_travel ( %tky = travel-%tky
-                                                 %assoc-_Booking = lv_allow
+                                                 %assoc-_Booking = lv_allow ""Button 'Create' enabled or disabled for Booking Entity
                                                  %features-%action-acceptTravel =
                                                         COND #( WHEN travel-OverallStatus = 'A'
                                                                     THEN if_abap_behv=>fc-o-disabled
@@ -356,6 +354,7 @@ CLASS lhc_Travel IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD copyTravel.
+    """INSTANCE BASE FACTORY ACTION
 
     "Shallow Copy = Header
     "Deep Copy = Header, Items, Sub Items
@@ -451,12 +450,13 @@ CLASS lhc_Travel IMPLEMENTATION.
                     WITH booksuppl_cba
          MAPPED DATA(mapped_data).
 
-    "mapped-travel = mapped_data-travel.
-    mapped = mapped_data.
+    "mapped-travel = mapped_data-travel. ////SHALLOW COPY
+    mapped = mapped_data.  """/// DEEP COPY
 
   ENDMETHOD.
 
   METHOD reCalcTotalPrice.
+    """INTERNAL ACTION
 
 *    Define a structure where we can store all the Booking Fees and Currency Code
     TYPES : BEGIN OF ty_total_cost,
@@ -633,9 +633,31 @@ CLASS lhc_Travel IMPLEMENTATION.
 
       ""Homework : Add following validations
       "1. Check if the travel start date is >= todays
-      "2. Travel End date must be > Begin Date
-      "3. Travel begin and end date must not be Initial
+      IF ( ls_travel-BeginDate IS INITIAL OR ls_travel-BeginDate < cl_abap_context_info=>get_system_date( ) ).
+        APPEND VALUE #( %tky =  ls_travel-%tky %is_draft = ls_travel-%is_draft ) TO failed-travel.
+        APPEND VALUE #( %tky =  ls_travel-%tky %is_draft = ls_travel-%is_draft
+                        %element-begindate = if_abap_behv=>mk-on
+                        %msg = new_message_with_text(
+                                 severity = if_abap_behv_message=>severity-error
+                                 text     = 'Travel Begin Date should be Greater than or equalt to todays date.'
+                               )
+            ) TO reported-travel.
+      ENDIF.
 
+      "2. Travel End date must be > Begin Date
+      IF ( ls_travel-EndDate IS INITIAL OR ls_travel-EndDate < ls_travel-BeginDate ).
+        APPEND VALUE #( %tky =  ls_travel-%tky %is_draft = ls_travel-%is_draft ) TO failed-travel.
+        APPEND VALUE #( %tky =  ls_travel-%tky %is_draft = ls_travel-%is_draft
+                        %element-enddate  = if_abap_behv=>mk-on
+                        %msg = new_message_with_text(
+                                 severity = if_abap_behv_message=>severity-error
+                                 text     = 'Travel End Date should be Greater than Begin date.'
+                               )
+            ) TO reported-travel.
+      ENDIF.
+
+      "3. Travel begin and end date must not be Initial
+      ""ALREADY IMPLEMENTED ABOVE
     ENDLOOP.
 
   ENDMETHOD.
