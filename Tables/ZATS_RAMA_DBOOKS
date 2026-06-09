@@ -1,0 +1,19 @@
+@EndUserText.label : 'Draft table for entity ZATS_RAMA_BOOKNGSUPPL_M_01'
+@AbapCatalog.enhancement.category : #EXTENSIBLE_ANY
+@AbapCatalog.tableCategory : #TRANSPARENT
+@AbapCatalog.deliveryClass : #A
+@AbapCatalog.dataMaintenance : #RESTRICTED
+define table zats_rama_dbooks {
+
+  key mandt               : mandt not null;
+  key travelid            : /dmo/travel_id not null;
+  key bookingid           : /dmo/booking_id not null;
+  key bookingsupplementid : /dmo/booking_supplement_id not null;
+  supplementid            : /dmo/supplement_id;
+  @Semantics.amount.currencyCode : 'zats_rama_dbooks.currencycode'
+  price                   : /dmo/supplement_price;
+  currencycode            : /dmo/currency_code;
+  lastchangedat           : abp_locinst_lastchange_tstmpl;
+  "%admin"                : include sych_bdl_draft_admin_inc;
+
+}
