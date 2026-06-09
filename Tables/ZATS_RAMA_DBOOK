@@ -1,0 +1,23 @@
+@EndUserText.label : 'Draft table for entity ZATS_RAMA_BOOKING_M_01'
+@AbapCatalog.enhancement.category : #EXTENSIBLE_ANY
+@AbapCatalog.tableCategory : #TRANSPARENT
+@AbapCatalog.deliveryClass : #A
+@AbapCatalog.dataMaintenance : #RESTRICTED
+define table zats_rama_dbook {
+
+  key mandt     : mandt not null;
+  key travelid  : /dmo/travel_id not null;
+  key bookingid : /dmo/booking_id not null;
+  bookingdate   : /dmo/booking_date;
+  customerid    : /dmo/customer_id;
+  carrierid     : /dmo/carrier_id;
+  connectionid  : /dmo/connection_id;
+  flightdate    : /dmo/flight_date;
+  @Semantics.amount.currencyCode : 'zats_rama_dbook.currencycode'
+  flightprice   : /dmo/flight_price;
+  currencycode  : /dmo/currency_code;
+  bookingstatus : /dmo/booking_status;
+  lastchangedat : abp_locinst_lastchange_tstmpl;
+  "%admin"      : include sych_bdl_draft_admin_inc;
+
+}
