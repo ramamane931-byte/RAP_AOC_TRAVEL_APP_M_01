@@ -3,7 +3,7 @@
 @AbapCatalog.tableCategory : #TRANSPARENT
 @AbapCatalog.deliveryClass : #A
 @AbapCatalog.dataMaintenance : #RESTRICTED
-define table zats_rama_attach {
+define table zats_rama_attach { 
 
   key client            : abap.clnt not null;
   key travel_id         : /dmo/travel_id not null;
